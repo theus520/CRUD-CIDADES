@@ -1,6 +1,9 @@
-package br.rabelo.especializacao.crudcidades.view;
+package br.rabelo.especializacao.crudcidades.view.controller;
 import java.util.HashSet;
 import java.util.Set;
+
+import br.rabelo.especializacao.crudcidades.view.Cidade;
+import br.rabelo.especializacao.crudcidades.view.repository.CidadeRepository;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,13 +11,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+
 @Controller
 public class CidadeController {
 
     private Set<Cidade> cidades;
 
-    public CidadeController() {
+    private final CidadeRepository cidadeRepository;
+
+    public CidadeController(CidadeRepository cidadeRepository) {
         cidades = new HashSet<>();
+        this.cidadeRepository = cidadeRepository;
     }
 
     @GetMapping("/")
