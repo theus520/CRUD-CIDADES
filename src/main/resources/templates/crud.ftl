@@ -65,7 +65,7 @@
                     </tr>
                 </#list>
             </tbody>
-        </table>
+        </table> 
     </div>
 </body>
 
