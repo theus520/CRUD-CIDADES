@@ -19,21 +19,41 @@
         </div>
 
             <#if cidadeAtual??>
-                <form action="/alterar" method="POST">
+                <form action="/alterar" method="POST" class="needs-validation" novalidate>
                 <input type="hidden" name="nomeAtual" value="${(cidadeAtual.nome)!}"/>
                 <input type="hidden" name="estadoAtual" value="${(cidadeAtual.estado)!}"/>
             <#else>
-                <form action="/criar" method="POST">
+                <form action="/criar" method="POST" class="needs-validation" novalidate>
             </#if>
         
             <div class="form-group">
                 <label for="nome">Cidade:</label>
-                <input required value="${(cidadeAtual.nome)!}" name="nome" type="text" class="form-control" placeholder="Informe o nome da cidade" id="nome">
+                <input 
+                    value="${(cidadeAtual.nome)!}${nomeInformado!}" 
+                    name="nome" 
+                    type="text" 
+                    class="form-control ${(nome??)?then('is-invalid', '')}" 
+                    placeholder="Informe o nome da cidade" 
+                    id="nome">
+                
+                <div class="invalid-feedback">
+                    ${nome!}
+                </div>
             </div>
+
             <div class="form-group">
                 <label for="estado">Estado:</label>
-                <input  maxlength="2" required value="${(cidadeAtual.estado)!}" name="estado" type="text" class="form-control" placeholder="Informe o estado ao qual a cidade pertence"
+                <input 
+                    value="${(cidadeAtual.estado)!}${estadoInformado!}" 
+                    name="estado" 
+                    type="text" 
+                    class="form-control ${(estado??)?then('is-invalid', '')}" 
+                    placeholder="Informe o estado ao qual a cidade pertence"
                     id="estado">
+
+                <div class="invalid-feedback">
+                    ${estado!}
+                </div>
             </div>
 
             <#if cidadeAtual??>
@@ -65,7 +85,7 @@
                     </tr>
                 </#list>
             </tbody>
-        </table> 
+        </table>
     </div>
 </body>
 

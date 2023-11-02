@@ -1,4 +1,5 @@
-package br.edu.utfpr.cp.espjava.crudcidades.visao;
+
+package br.rabelo.especializacao.crudcidades.view.entidade;
 
 import java.io.Serializable;
 
@@ -8,13 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity (name = "cidade")
-public class CidadeEntidade implements Serializable{
+public class CidadeEntidade implements Serializable {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
     private String estado;
-    
+
     public String getEstado() {
         return estado;
     }
@@ -22,7 +24,7 @@ public class CidadeEntidade implements Serializable{
     public Long getId() {
         return id;
     }
-    
+
     public String getNome() {
         return nome;
     }

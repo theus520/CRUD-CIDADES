@@ -1,12 +1,16 @@
 package br.rabelo.especializacao.crudcidades.view.controller;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import br.rabelo.especializacao.crudcidades.view.Cidade;
 import br.rabelo.especializacao.crudcidades.view.repository.CidadeRepository;
+import jakarta.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +21,7 @@ public class CidadeController {
 
     private Set<Cidade> cidades;
 
+    @Autowired
     private final CidadeRepository cidadeRepository;
 
     public CidadeController(CidadeRepository cidadeRepository) {
@@ -27,15 +32,30 @@ public class CidadeController {
     @GetMapping("/")
     public String listar(Model memoria) {
 
-        memoria.addAttribute("listaCidades", cidades);
-
+        memoria.addAttribute("listaCidades", cidadeRepository.findAll()
+                                                                            .stream()
+        .map(cidade -> new Cidade(cidade.getNome(),cidade.getEstado())).collect(Collectors.toList()));
         return "/crud";
     }
 
     @PostMapping("/criar")
-    public String criar(Cidade cidade) {
+    public String criar(@Valid Cidade cidade, BindingResult validacao, Model memoria) {
+        if (validacao.hasErrors()) {
+            validacao.getFieldErrors().forEach
+            (
+                error -> memoria.addAttribute(error.getField(), error.getDefaultMessage())
+                
+                    );
 
-        cidades.add(cidade);
+
+                    memoria.addAttribute("nomeInformado", cidade.getNome());
+                    memoria.addAttribute("estadoInformado", cidade.getEstado());
+                    memoria.addAttribute("listaCidades", cidade);
+                   return "/crud";
+        }else{
+            
+            cidades.add(cidade);
+        }
 
         return "redirect:/";
     }
@@ -77,13 +97,13 @@ public class CidadeController {
     public String alterar(
         @RequestParam String nomeAtual, 
         @RequestParam String estadoAtual,
-        Cidade cidade) {
+        Cidade cidade,BindingResult validacao, Model memoria) {
 
             cidades.removeIf(cidadeAtual -> 
                     cidadeAtual.getNome().equals(nomeAtual) && 
                     cidadeAtual.getEstado().equals(estadoAtual));
 
-            criar(cidade);
+          criar(cidade,validacao,memoria);
 
             return "redirect:/";
     }
