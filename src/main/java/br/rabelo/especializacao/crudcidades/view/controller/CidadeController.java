@@ -3,10 +3,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import br.rabelo.especializacao.crudcidades.view.Cidade;
-import br.rabelo.especializacao.crudcidades.view.repository.CidadeRepository;
-import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +10,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import br.rabelo.especializacao.crudcidades.view.Cidade;
+import br.rabelo.especializacao.crudcidades.view.repository.CidadeRepository;
+import jakarta.validation.Valid;
 
 
 @Controller
@@ -53,8 +53,7 @@ public class CidadeController {
                     memoria.addAttribute("listaCidades", cidade);
                    return "/crud";
         }else{
-            
-            cidades.add(cidade);
+            cidadeRepository.save(cidade.clonar());
         }
 
         return "redirect:/";
@@ -65,9 +64,8 @@ public class CidadeController {
             @RequestParam String nome, 
             @RequestParam String estado) {
 
-        cidades.removeIf(cidadeAtual -> 
-                    cidadeAtual.getNome().equals(nome) && 
-                    cidadeAtual.getEstado().equals(estado));
+        var cidadeEstadoEncontrada = cidadeRepository.findByNomeAndEstado(nome, estado);
+        cidadeEstadoEncontrada.ifPresent(cidadeRepository::delete);
 
         return "redirect:/";
     }
@@ -78,18 +76,10 @@ public class CidadeController {
         @RequestParam String estado,
         Model memoria) {
 
-            var cidadeAtual = cidades
-                    .stream()
-                    .filter(cidade -> 
-                        cidade.getNome().equals(nome) && 
-                        cidade.getEstado().equals(estado))
-                    .findAny();
-
-            if (cidadeAtual.isPresent()) {
-                memoria.addAttribute("cidadeAtual", cidadeAtual.get());
-                memoria.addAttribute("listaCidades", cidades);
-            }
-
+            var cidadeAtual = cidadeRepository.findByNomeAndEstado(nome, estado);
+            cidadeAtual.ifPresent(cidadeEncontrada -> {memoria.addAttribute("cidadeAtual", cidadeEncontrada);
+            memoria.addAttribute("listaCidades", cidadeRepository.findAll());
+         });
             return "/crud";
     }
 
@@ -99,11 +89,17 @@ public class CidadeController {
         @RequestParam String estadoAtual,
         Cidade cidade,BindingResult validacao, Model memoria) {
 
-            cidades.removeIf(cidadeAtual -> 
-                    cidadeAtual.getNome().equals(nomeAtual) && 
-                    cidadeAtual.getEstado().equals(estadoAtual));
+            var cidadeAtual = cidadeRepository.findByNomeAndEstado(nomeAtual, estadoAtual);
 
-          criar(cidade,validacao,memoria);
+            if (cidadeAtual.isPresent()) {
+            
+                var cidadeEncontrada = cidadeAtual.get();
+                cidadeEncontrada.setNome(cidade.getNome());
+                cidadeEncontrada.setEstado(cidade.getEstado());
+
+                cidadeRepository.saveAndFlush(cidadeEncontrada);
+                
+            }
 
             return "redirect:/";
     }

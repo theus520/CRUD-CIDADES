@@ -1,5 +1,6 @@
 package br.rabelo.especializacao.crudcidades.view;
 
+import br.rabelo.especializacao.crudcidades.view.entidade.CidadeEntidade;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -24,5 +25,14 @@ public class Cidade {
 		return estado;
 	}
 	
+	public CidadeEntidade clonar(){
+		var cidadeEntidade = new CidadeEntidade();
+        cidadeEntidade.setNome(this.getNome());
+		cidadeEntidade.setEstado(this.estado);
+		return cidadeEntidade;
+	}
 	
+	public Cidade clonar(CidadeEntidade cidade){
+		return new Cidade(cidade.getNome(), cidade.getEstado());
+	}
 }
